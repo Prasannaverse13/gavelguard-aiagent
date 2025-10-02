@@ -2,8 +2,6 @@ import Navigation from "@/components/Navigation";
 import Hero from "@/components/Hero";
 import Stats from "@/components/Stats";
 import Features from "@/components/Features";
-import AuctionDashboard from "@/components/AuctionDashboard";
-import StrategyConfig from "@/components/StrategyConfig";
 
 const Index = () => {
   return (
@@ -12,8 +10,6 @@ const Index = () => {
       <Hero />
       <Stats />
       <Features />
-      <AuctionDashboard />
-      <StrategyConfig />
       
       {/* Footer */}
       <footer className="border-t border-border/50 bg-card/30 backdrop-blur-sm mt-20">

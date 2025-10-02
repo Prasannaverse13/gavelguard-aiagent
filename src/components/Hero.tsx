@@ -42,11 +42,17 @@ const Hero = () => {
 
                 return (
                   <Button
-                    onClick={openConnectModal}
+                    onClick={() => {
+                      if (connected) {
+                        window.location.href = '/dashboard';
+                      } else {
+                        openConnectModal();
+                      }
+                    }}
                     size="lg"
                     className="gradient-accent shadow-glow hover:shadow-glow hover:scale-105 transition-all duration-300 text-lg px-8"
                   >
-                    {connected ? 'Dashboard' : 'Connect Wallet'}
+                    {connected ? 'Go to Dashboard' : 'Connect Wallet to Start'}
                   </Button>
                 );
               }}
