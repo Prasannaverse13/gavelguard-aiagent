@@ -12,7 +12,7 @@ const Navigation = () => {
             </div>
             <span className="text-xl font-bold">
               <span className="text-foreground">Gavel</span>
-              <span className="gradient-accent bg-clip-text text-transparent">Guard AI</span>
+              <span className="text-primary">Guard AI</span>
             </span>
           </div>
           
