@@ -39,7 +39,7 @@ All colors MUST be HSL.
     --radius: 0.75rem;
 
     --gradient-primary: linear-gradient(135deg, hsl(222 47% 11%), hsl(263 70% 35%));
-    --gradient-accent: linear-gradient(90deg, hsl(263 70% 65%), hsl(280 60% 55%));
+    --gradient-accent: linear-gradient(90deg, hsl(263 90% 75%), hsl(280 85% 70%));
     --gradient-glow: linear-gradient(180deg, hsl(263 70% 65% / 0.1), transparent);
     
     --shadow-glow: 0 0 40px hsl(263 70% 65% / 0.3);
