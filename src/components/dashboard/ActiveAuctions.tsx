@@ -62,19 +62,9 @@ const ActiveAuctions = () => {
         </div>
       )}
       
-      {error && (
-        <Card className="bg-yellow-500/10 border-yellow-500/30">
-          <CardContent className="py-6">
-            <p className="text-yellow-600 dark:text-yellow-400 text-center font-semibold">Demo Mode Active</p>
-            <p className="text-sm text-muted-foreground text-center mt-2">
-              Showing sample auction data. Real Doma Protocol integration pending API schema confirmation.
-            </p>
-          </CardContent>
-        </Card>
-      )}
 
       {/* Auction Cards Grid */}
-      {!loading && !error && auctions.length > 0 && (
+      {!loading && auctions.length > 0 && (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
           {auctions.map((auction) => (
             <AuctionCard key={auction.id} {...auction} />
@@ -82,7 +72,7 @@ const ActiveAuctions = () => {
         </div>
       )}
 
-      {!loading && !error && auctions.length === 0 && (
+      {!loading && auctions.length === 0 && (
         <Card className="bg-muted/20">
           <CardContent className="py-12 text-center">
             <p className="text-muted-foreground">No active auctions found on Doma Protocol</p>
