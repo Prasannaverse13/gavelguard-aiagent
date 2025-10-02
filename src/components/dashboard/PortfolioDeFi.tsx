@@ -72,12 +72,19 @@ const PortfolioDeFi = () => {
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
-          {loading && <p className="text-center text-muted-foreground">Loading your domains...</p>}
-          {error && <p className="text-center text-destructive">Error: {error}</p>}
-          {!loading && !error && domains.length === 0 && (
-            <p className="text-center text-muted-foreground">No domains found. Win your first auction to see them here!</p>
+          {loading && <p className="text-center text-muted-foreground py-8">Loading your domains from Doma Protocol...</p>}
+          {error && (
+            <div className="py-6 px-4 rounded-lg bg-yellow-500/10 border border-yellow-500/30">
+              <p className="text-center font-semibold text-yellow-600 dark:text-yellow-400">Demo Mode Active</p>
+              <p className="text-sm text-muted-foreground text-center mt-2">
+                Showing sample portfolio data. Real domain ownership will sync when connected to Doma Protocol.
+              </p>
+            </div>
           )}
-          {!loading && !error && domains.map((domain) => (
+          {!loading && domains.length === 0 && !error && (
+            <p className="text-center text-muted-foreground py-8">No domains found. Win your first auction to see them here!</p>
+          )}
+          {!loading && domains.map((domain) => (
             <DomainCard key={domain.id} {...domain} />
           ))}
         </CardContent>

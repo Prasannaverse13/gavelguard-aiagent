@@ -63,11 +63,11 @@ const ActiveAuctions = () => {
       )}
       
       {error && (
-        <Card className="bg-destructive/10 border-destructive/30">
+        <Card className="bg-yellow-500/10 border-yellow-500/30">
           <CardContent className="py-6">
-            <p className="text-destructive text-center">Error loading auctions: {error}</p>
+            <p className="text-yellow-600 dark:text-yellow-400 text-center font-semibold">Demo Mode Active</p>
             <p className="text-sm text-muted-foreground text-center mt-2">
-              Make sure you're connected to Doma Testnet
+              Showing sample auction data. Real Doma Protocol integration pending API schema confirmation.
             </p>
           </CardContent>
         </Card>

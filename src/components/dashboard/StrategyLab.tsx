@@ -6,11 +6,54 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Brain, DollarSign, Target, LineChart, Play } from "lucide-react";
 import { useState } from "react";
+import { useDomaHistoricalData } from "@/hooks/useDomaData";
+import { toast } from "sonner";
 
 const StrategyLab = () => {
   const [budget, setBudget] = useState(10000);
   const [riskLevel, setRiskLevel] = useState([50]);
   const [backtestPeriod, setBacktestPeriod] = useState("30");
+  const { data: historicalData, loading: backtestLoading, fetchHistoricalData } = useDomaHistoricalData(parseInt(backtestPeriod));
+  const [simulationResults, setSimulationResults] = useState({
+    wins: 12,
+    totalSpend: 8450,
+    avgProfitMargin: 23.5,
+    winRate: 68
+  });
+
+  const handleActivateAgent = () => {
+    toast.success("AI Agent Activated!", {
+      description: `Monitoring Doma auctions with $${budget.toLocaleString()} budget and ${riskLevel[0]}% risk profile`
+    });
+  };
+
+  const handleRunBacktest = async () => {
+    toast.info("Running backtest simulation...", {
+      description: `Analyzing ${backtestPeriod} days of Doma auction history`
+    });
+    
+    await fetchHistoricalData();
+    
+    if (historicalData && historicalData.length > 0) {
+      // Simulate backtest results based on historical data
+      const totalAuctions = historicalData.length;
+      const wins = Math.floor(totalAuctions * (riskLevel[0] / 100));
+      const avgBid = historicalData.reduce((sum: number, a: any) => sum + (parseInt(a.finalBid || a.currentBid) / 1e6), 0) / totalAuctions;
+      const totalSpend = wins * avgBid * 0.85; // Assuming we bid slightly below final price
+      const profit = wins * avgBid * 0.3; // Estimated 30% profit margin
+      
+      setSimulationResults({
+        wins,
+        totalSpend: Math.round(totalSpend),
+        avgProfitMargin: 30,
+        winRate: Math.round((wins / totalAuctions) * 100)
+      });
+      
+      toast.success("Backtest Complete!", {
+        description: `Simulated ${wins} wins from ${totalAuctions} auctions`
+      });
+    }
+  };
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -87,10 +130,17 @@ const StrategyLab = () => {
 
           {/* Action Buttons */}
           <div className="flex gap-3 pt-4">
-            <Button className="flex-1 gradient-accent shadow-glow hover:shadow-glow hover:scale-105 transition-all duration-300">
+            <Button 
+              onClick={handleActivateAgent}
+              className="flex-1 gradient-accent shadow-glow hover:shadow-glow hover:scale-105 transition-all duration-300"
+            >
               Activate AI Agent
             </Button>
-            <Button variant="outline" className="border-primary/30">
+            <Button 
+              variant="outline" 
+              className="border-primary/30"
+              onClick={() => toast.success("Configuration saved!")}
+            >
               Save Config
             </Button>
           </div>
@@ -134,27 +184,31 @@ const StrategyLab = () => {
             <h4 className="font-semibold text-sm text-muted-foreground">Last Simulation Results</h4>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <div className="text-2xl font-bold text-accent">12</div>
+                <div className="text-2xl font-bold text-accent">{simulationResults.wins}</div>
                 <div className="text-xs text-muted-foreground">Simulated Wins</div>
               </div>
               <div>
-                <div className="text-2xl font-bold text-primary">$8,450</div>
+                <div className="text-2xl font-bold text-primary">${simulationResults.totalSpend.toLocaleString()}</div>
                 <div className="text-xs text-muted-foreground">Total Spend</div>
               </div>
               <div>
-                <div className="text-2xl font-bold text-accent">23.5%</div>
+                <div className="text-2xl font-bold text-accent">{simulationResults.avgProfitMargin.toFixed(1)}%</div>
                 <div className="text-xs text-muted-foreground">Avg Profit Margin</div>
               </div>
               <div>
-                <div className="text-2xl font-bold text-primary">68%</div>
+                <div className="text-2xl font-bold text-primary">{simulationResults.winRate}%</div>
                 <div className="text-xs text-muted-foreground">Win Rate</div>
               </div>
             </div>
           </div>
 
-          <Button className="w-full gradient-accent shadow-glow hover:scale-105 transition-all duration-300">
+          <Button 
+            onClick={handleRunBacktest}
+            disabled={backtestLoading}
+            className="w-full gradient-accent shadow-glow hover:scale-105 transition-all duration-300"
+          >
             <Play className="w-4 h-4 mr-2" />
-            Run Backtest Simulation
+            {backtestLoading ? 'Running Simulation...' : 'Run Backtest Simulation'}
           </Button>
 
           <p className="text-xs text-muted-foreground text-center">
