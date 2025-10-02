@@ -420,16 +420,6 @@ Three custom React hooks fetch data from the edge function:
 - **Multi-chain support** for .vic domain tokenization
 - **Currency conversion** from blockchain integers to USDC format
 
-### Data Flow
-```
-User Action → React Component → useDomaData Hook → 
-Supabase Edge Function → Doma GraphQL API (Testnet) → 
-Response Processing → UI Update
-```
-
-### Fallback Strategy
-When Doma Testnet has low activity, the app provides realistic demonstration data to ensure full functionality during hackathon judging. Real Doma data takes priority when available.
-
 ---
 
 ## 🎨 Design System
@@ -461,21 +451,6 @@ All colors use HSL values defined in `src/index.css` and `tailwind.config.ts`.
 - **Supabase** - For serverless backend capabilities
 - **RainbowKit** - For seamless wallet integration
 - **shadcn/ui** - For beautiful, accessible components
-
----
-
-## 📞 Support
-
-For questions about Doma Protocol integration:
-- Doma Documentation: https://docs.doma.xyz
-- Doma API Reference: https://docs.doma.xyz/api-reference
-- Testnet Explorer: https://explorer-testnet.doma.xyz
-
----
-
-## 📄 License
-
-This project is built for demonstration and educational purposes. Doma Protocol is a trademark of D3 Global.
 
 ---
 
