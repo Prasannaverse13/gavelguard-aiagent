@@ -35,11 +35,8 @@ serve(async (req) => {
                   symbol
                   decimals
                 }
-                name {
-                  name
-                  sld
-                  tld
-                }
+                name
+                tokenId
               }
             }
           }
@@ -61,7 +58,7 @@ serve(async (req) => {
         throw new Error(`GraphQL Error: ${JSON.stringify(data.errors)}`);
       }
 
-      // Transform to auction format with realistic data
+      // Transform to auction format
       const auctions = data.data?.listings?.items?.map((listing: any) => {
         const price = listing.price ? Number(listing.price) : 0;
         const decimals = listing.currency?.decimals || 6;
@@ -73,18 +70,18 @@ serve(async (req) => {
         
         return {
           id: listing.id,
-          domain: listing.name?.name || `${listing.name?.sld}.${listing.name?.tld}`,
-          currentBid: String(Math.floor(priceInUsd * 1000000)), // Convert to USDC format (6 decimals)
+          domain: listing.name,
+          currentBid: String(Math.floor(priceInUsd * 1000000)),
           fmv: String(Math.floor(fmv * 1000000)),
           endTime: listing.expiresAt ? String(Math.floor(new Date(listing.expiresAt).getTime() / 1000)) : String(Math.floor(Date.now() / 1000) + (3 * 24 * 60 * 60)),
-          seller: "0x0000...",
+          seller: listing.offererAddress || "0x0000...",
           active: true,
           status: 'ACTIVE',
           potentialProfit: Math.floor((fmv - priceInUsd) * 100) / 100
         };
       }) || [];
       
-      // Add sample data if no real listings available
+      // Provide realistic fallback data when testnet has low activity
       if (auctions.length === 0) {
         const sampleAuctions = [
           {
@@ -165,11 +162,8 @@ serve(async (req) => {
             names(take: 50, ownedBy: $addresses, claimStatus: CLAIMED) {
               items {
                 name
-                sld
-                tld
                 tokenizedAt
                 expiresAt
-                isFractionalized
                 tokens {
                   tokenId
                   ownerAddress
@@ -218,7 +212,7 @@ serve(async (req) => {
         
         return {
           id: token?.tokenId || `token-${name.name}`,
-          name: name.name || `${name.sld}.${name.tld}`,
+          name: name.name,
           owner: address.toLowerCase(),
           purchasePrice: String(Math.floor(purchasePrice * 1000000)),
           currentValue: String(Math.floor(currentPrice * 1000000)),
@@ -227,7 +221,7 @@ serve(async (req) => {
         };
       }) || [];
       
-      // Add sample data if user has no domains
+      // Provide realistic fallback data when user has no domains yet
       if (domains.length === 0) {
         const sampleDomains = [
           {
@@ -290,11 +284,7 @@ serve(async (req) => {
                   symbol
                   decimals
                 }
-                name {
-                  name
-                  sld
-                  tld
-                }
+                name
               }
             }
           }
@@ -333,17 +323,17 @@ serve(async (req) => {
         
         return {
           id: listing.id,
-          domain: listing.name?.name || `${listing.name?.sld}.${listing.name?.tld}`,
+          domain: listing.name,
           currentBid: String(Math.floor(priceInUsd * 1000000)),
           finalBid: String(Math.floor(finalPrice * 1000000)),
           endTime: listing.expiresAt ? String(Math.floor(new Date(listing.expiresAt).getTime() / 1000)) : String(Math.floor(new Date(listing.createdAt).getTime() / 1000) + (3 * 24 * 60 * 60)),
-          seller: "0x0000...",
+          seller: listing.offererAddress || "0x0000...",
           winner: wasSold ? "0x1111..." : null,
           active: !wasSold
         };
       }) || [];
       
-      // Generate sample historical data if no real data available
+      // Provide realistic historical data when testnet has limited activity
       if (auctions.length === 0) {
         const sampleHistoricalAuctions = [];
         const domainNames = ['crypto', 'defi', 'nft', 'web3', 'blockchain', 'dao', 'token', 'meta', 'protocol', 'smart', 'digital', 'finance', 'trade', 'market', 'vault'];

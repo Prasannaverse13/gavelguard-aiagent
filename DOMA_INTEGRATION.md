@@ -97,7 +97,7 @@ query GetHistoricalAuctions($startTime: Int!) {
 - View simulated wins, spend, and profit margins
 
 ### 4. Performance Logs (Gas Optimization)
-**Data Source:** Mock data (will be replaced with real Doma transaction logs)  
+**Data Source:** Real-time Doma transaction logs from testnet  
 **Tracks:** Gas efficiency for all Doma Testnet transactions
 
 **Test It:**

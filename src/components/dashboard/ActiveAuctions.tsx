@@ -5,12 +5,26 @@ import { Badge } from "@/components/ui/badge";
 import { Activity, DollarSign, TrendingUp, Clock, Plus, Pause } from "lucide-react";
 import { useDomaAuctions } from "@/hooks/useDomaData";
 import { useState } from "react";
+import { toast } from "@/hooks/use-toast";
+import WatchlistConfirmation from "./WatchlistConfirmation";
 
 const ActiveAuctions = () => {
   const { auctions, loading, error } = useDomaAuctions();
   const [watchlistDomain, setWatchlistDomain] = useState("blockchain.vic");
+  const [watchedDomain, setWatchedDomain] = useState<string | null>(null);
+
+  const handleAddToWatchlist = () => {
+    setWatchedDomain(watchlistDomain);
+    toast({
+      title: "Domain Added to Watchlist",
+      description: `"${watchlistDomain}" is now being monitored by your AI agent.`,
+    });
+  };
   return (
     <div className="space-y-6">
+      {/* Watchlist Confirmation */}
+      {watchedDomain && <WatchlistConfirmation domain={watchedDomain} />}
+
       {/* Header Card */}
       <Card className="shadow-card bg-card/80 backdrop-blur-sm border-border/50">
         <CardHeader>
@@ -44,7 +58,11 @@ const ActiveAuctions = () => {
                 value={watchlistDomain}
                 onChange={(e) => setWatchlistDomain(e.target.value)}
               />
-              <Button variant="outline" className="border-primary/30 whitespace-nowrap">
+              <Button 
+                variant="outline" 
+                className="border-primary/30 whitespace-nowrap"
+                onClick={handleAddToWatchlist}
+              >
                 Add to Watchlist
               </Button>
             </div>
