@@ -15,11 +15,25 @@ const queryClient = new QueryClient();
 const App = () => (
   <WagmiProvider config={config}>
     <QueryClientProvider client={queryClient}>
-      <RainbowKitProvider theme={darkTheme({
-        accentColor: '#8B5CF6',
-        accentColorForeground: 'white',
-        borderRadius: 'large',
-      })}>
+      <RainbowKitProvider 
+        theme={darkTheme({
+          accentColor: '#8B5CF6',
+          accentColorForeground: 'white',
+          borderRadius: 'large',
+        })}
+        coolMode
+        appInfo={{
+          appName: 'GavelGuard AI',
+          learnMoreUrl: 'https://gavelguard.ai',
+          disclaimer: ({ Text, Link }) => (
+            <Text>
+              By connecting your wallet, you agree to participate in AI-powered domain auctions on Doma Protocol. 
+              Always verify transaction details before confirming. {' '}
+              <Link href="https://gavelguard.ai/terms">Terms & Conditions</Link>
+            </Text>
+          ),
+        }}
+      >
         <TooltipProvider>
           <Toaster />
           <Sonner />
