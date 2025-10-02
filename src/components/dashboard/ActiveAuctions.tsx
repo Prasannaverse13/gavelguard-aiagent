@@ -65,15 +65,16 @@ const ActiveAuctions = () => {
             </div>
             <div className="flex gap-2">
               <Input 
-                placeholder="Add domain to watchlist (e.g., web3.vic)" 
+                placeholder="Try: blockchain.vic or ai.vic" 
                 className="bg-secondary/50"
+                defaultValue="blockchain.vic"
               />
               <Button variant="outline" className="border-primary/30 whitespace-nowrap">
                 Add to Watchlist
               </Button>
             </div>
             <p className="text-xs text-muted-foreground">
-              Manually add domains for AI monitoring or use override to place human-controlled bids
+              Example: Add "blockchain.vic" to monitor this domain. AI will track and bid based on your strategy.
             </p>
           </div>
         </CardContent>
