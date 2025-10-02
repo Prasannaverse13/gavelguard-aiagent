@@ -1,8 +1,8 @@
-# DomainFi AI Agent - Automated Domain Auction Platform
+# Gavelguard AI Agent - Automated Domain Auction Platform
 
 ## 🌟 Introduction
 
-**DomainFi AI Agent** is an intelligent, fully automated platform for participating in domain name auctions on the **Doma Protocol** blockchain network. This cutting-edge application leverages AI-powered decision-making to analyze, bid, and manage domain portfolios autonomously on the Doma Testnet.
+**Gavelguard AI Agent** is an intelligent, fully automated platform for participating in domain name auctions on the **Doma Protocol** blockchain network. This cutting-edge application leverages AI-powered decision-making to analyze, bid, and manage domain portfolios autonomously on the Doma Testnet.
 
 The platform combines advanced auction strategies, real-time blockchain data integration, and DeFi utilities to revolutionize how domain investors interact with the decentralized domain marketplace.
 
