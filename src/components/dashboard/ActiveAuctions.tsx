@@ -3,38 +3,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Activity, DollarSign, TrendingUp, Clock, Plus, Pause } from "lucide-react";
-
-const mockAuctions = [
-  {
-    id: 1,
-    domain: "crypto.vic",
-    currentBid: 5200,
-    fmv: 6800,
-    timeLeft: "2h 34m",
-    status: "Active Bid",
-    potentialProfit: 1600,
-  },
-  {
-    id: 2,
-    domain: "defi.vic",
-    currentBid: 3100,
-    fmv: 4200,
-    timeLeft: "5h 12m",
-    status: "Monitoring",
-    potentialProfit: 1100,
-  },
-  {
-    id: 3,
-    domain: "nft.vic",
-    currentBid: 4500,
-    fmv: 5900,
-    timeLeft: "1h 08m",
-    status: "Active Bid",
-    potentialProfit: 1400,
-  },
-];
+import { useDomaAuctions } from "@/hooks/useDomaData";
+import { useState } from "react";
 
 const ActiveAuctions = () => {
+  const { auctions, loading, error } = useDomaAuctions();
+  const [watchlistDomain, setWatchlistDomain] = useState("blockchain.vic");
   return (
     <div className="space-y-6">
       {/* Header Card */}
@@ -67,7 +41,8 @@ const ActiveAuctions = () => {
               <Input 
                 placeholder="Try: blockchain.vic or ai.vic" 
                 className="bg-secondary/50"
-                defaultValue="blockchain.vic"
+                value={watchlistDomain}
+                onChange={(e) => setWatchlistDomain(e.target.value)}
               />
               <Button variant="outline" className="border-primary/30 whitespace-nowrap">
                 Add to Watchlist
@@ -80,12 +55,41 @@ const ActiveAuctions = () => {
         </CardContent>
       </Card>
 
+      {/* Status Messages */}
+      {loading && (
+        <div className="text-center py-8">
+          <p className="text-muted-foreground">Loading live auctions from Doma Protocol...</p>
+        </div>
+      )}
+      
+      {error && (
+        <Card className="bg-destructive/10 border-destructive/30">
+          <CardContent className="py-6">
+            <p className="text-destructive text-center">Error loading auctions: {error}</p>
+            <p className="text-sm text-muted-foreground text-center mt-2">
+              Make sure you're connected to Doma Testnet
+            </p>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Auction Cards Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-        {mockAuctions.map((auction) => (
-          <AuctionCard key={auction.id} {...auction} />
-        ))}
-      </div>
+      {!loading && !error && auctions.length > 0 && (
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+          {auctions.map((auction) => (
+            <AuctionCard key={auction.id} {...auction} />
+          ))}
+        </div>
+      )}
+
+      {!loading && !error && auctions.length === 0 && (
+        <Card className="bg-muted/20">
+          <CardContent className="py-12 text-center">
+            <p className="text-muted-foreground">No active auctions found on Doma Protocol</p>
+            <p className="text-sm text-muted-foreground mt-2">New auctions will appear here automatically</p>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 };

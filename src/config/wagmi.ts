@@ -9,25 +9,26 @@ import {
 } from '@rainbow-me/rainbowkit/wallets';
 import { createConfig, http } from 'wagmi';
 import { mainnet, polygon, optimism, arbitrum, base } from 'wagmi/chains';
+import type { Chain } from 'wagmi/chains';
 
-// Custom chain for Doma Testnet (example configuration)
+// Doma Testnet - Real configuration
 const domaTestnet = {
-  id: 9999, // Replace with actual Doma testnet chain ID
+  id: 97476,
   name: 'Doma Testnet',
   nativeCurrency: {
-    name: 'Doma',
-    symbol: 'DOMA',
+    name: 'Ethereum',
+    symbol: 'ETH',
     decimals: 18,
   },
   rpcUrls: {
-    default: { http: ['https://rpc.doma-testnet.example.com'] }, // Replace with actual RPC
-    public: { http: ['https://rpc.doma-testnet.example.com'] },
+    default: { http: ['https://rpc-testnet.doma.xyz'] },
+    public: { http: ['https://rpc-testnet.doma.xyz'] },
   },
   blockExplorers: {
-    default: { name: 'DomaExplorer', url: 'https://explorer.doma-testnet.example.com' },
+    default: { name: 'Doma Explorer', url: 'https://explorer-testnet.doma.xyz' },
   },
   testnet: true,
-};
+} as const satisfies Chain;
 
 const connectors = connectorsForWallets(
   [

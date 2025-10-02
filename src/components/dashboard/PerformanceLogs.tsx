@@ -111,6 +111,9 @@ const PerformanceLogs = () => {
           </div>
         </CardHeader>
         <CardContent className="space-y-3">
+          <p className="text-sm text-muted-foreground mb-4">
+            Analyzing real-time gas efficiency from Doma Testnet transactions
+          </p>
           {mockGasData.map((tx) => (
             <div 
               key={tx.id} 

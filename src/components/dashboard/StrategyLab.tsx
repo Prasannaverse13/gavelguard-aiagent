@@ -76,11 +76,12 @@ const StrategyLab = () => {
           <div className="space-y-3">
             <Label className="text-base font-semibold">Target Domains</Label>
             <Input
-              placeholder="e.g., .vic domains under 5 characters"
+              placeholder="Try: crypto.vic, defi.vic, web3.vic"
               className="bg-secondary/50"
+              defaultValue="crypto.vic"
             />
             <p className="text-sm text-muted-foreground">
-              Filter criteria for AI to monitor specific auctions
+              Example: Enter "crypto.vic" to monitor crypto-related .vic domains on Doma testnet
             </p>
           </div>
 

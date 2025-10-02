@@ -2,42 +2,17 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Wallet, TrendingUp, Shield, Coins } from "lucide-react";
-
-const mockDomains = [
-  {
-    id: 1,
-    domain: "ai.vic",
-    purchasePrice: 4200,
-    currentValue: 5800,
-    collateralScore: 92,
-    profit: 1600,
-    profitPercent: 38.1,
-  },
-  {
-    id: 2,
-    domain: "meta.vic",
-    purchasePrice: 3800,
-    currentValue: 4900,
-    collateralScore: 85,
-    profit: 1100,
-    profitPercent: 28.9,
-  },
-  {
-    id: 3,
-    domain: "blockchain.vic",
-    purchasePrice: 6100,
-    currentValue: 8200,
-    collateralScore: 96,
-    profit: 2100,
-    profitPercent: 34.4,
-  },
-];
+import { useDomaUserDomains } from "@/hooks/useDomaData";
+import { useAccount } from "wagmi";
 
 const PortfolioDeFi = () => {
-  const totalInvested = mockDomains.reduce((sum, d) => sum + d.purchasePrice, 0);
-  const totalValue = mockDomains.reduce((sum, d) => sum + d.currentValue, 0);
+  const { address } = useAccount();
+  const { domains, loading, error } = useDomaUserDomains(address);
+
+  const totalInvested = domains.reduce((sum, d) => sum + d.purchasePrice, 0);
+  const totalValue = domains.reduce((sum, d) => sum + d.currentValue, 0);
   const totalProfit = totalValue - totalInvested;
-  const avgProfitPercent = (totalProfit / totalInvested) * 100;
+  const avgProfitPercent = totalInvested > 0 ? (totalProfit / totalInvested) * 100 : 0;
 
   return (
     <div className="space-y-6">
@@ -52,7 +27,7 @@ const PortfolioDeFi = () => {
               <Wallet className="w-5 h-5 text-muted-foreground" />
               <span className="text-3xl font-bold">${totalInvested.toLocaleString()}</span>
             </div>
-            <p className="text-sm text-muted-foreground mt-2">Across {mockDomains.length} domains</p>
+            <p className="text-sm text-muted-foreground mt-2">Across {domains.length} domains</p>
           </CardContent>
         </Card>
 
@@ -97,7 +72,12 @@ const PortfolioDeFi = () => {
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
-          {mockDomains.map((domain) => (
+          {loading && <p className="text-center text-muted-foreground">Loading your domains...</p>}
+          {error && <p className="text-center text-destructive">Error: {error}</p>}
+          {!loading && !error && domains.length === 0 && (
+            <p className="text-center text-muted-foreground">No domains found. Win your first auction to see them here!</p>
+          )}
+          {!loading && !error && domains.map((domain) => (
             <DomainCard key={domain.id} {...domain} />
           ))}
         </CardContent>

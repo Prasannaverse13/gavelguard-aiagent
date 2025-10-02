@@ -1,0 +1,4 @@
+project_id = "cwnhwopkhewzovfnvoqz"
+
+[functions.doma-auctions]
+verify_jwt = false

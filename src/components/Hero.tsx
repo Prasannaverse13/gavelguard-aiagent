@@ -41,19 +41,41 @@ const Hero = () => {
                 const connected = ready && account && chain;
 
                 return (
-                  <Button
-                    onClick={() => {
-                      if (connected) {
-                        window.location.href = '/dashboard';
-                      } else {
-                        openConnectModal();
-                      }
-                    }}
-                    size="lg"
-                    className="gradient-accent shadow-glow hover:shadow-glow hover:scale-105 transition-all duration-300 text-lg px-8"
+                  <div
+                    {...(!ready && {
+                      'aria-hidden': true,
+                      style: {
+                        opacity: 0,
+                        pointerEvents: 'none',
+                        userSelect: 'none',
+                      },
+                    })}
                   >
-                    {connected ? 'Go to Dashboard' : 'Connect Wallet to Start'}
-                  </Button>
+                    <div className="flex flex-col items-center gap-4">
+                      <Button
+                        onClick={() => {
+                          if (connected) {
+                            window.location.href = '/dashboard';
+                          } else {
+                            openConnectModal();
+                          }
+                        }}
+                        size="lg"
+                        className="gradient-accent shadow-glow hover:shadow-glow hover:scale-105 transition-all duration-300 text-lg px-8"
+                      >
+                        {connected ? 'Go to Dashboard' : 'Connect Wallet to Start'}
+                      </Button>
+                      
+                      {connected && (
+                        <div className="flex items-center gap-2 px-6 py-3 rounded-lg bg-accent/10 border border-accent/30 animate-pulse-glow">
+                          <div className="w-2 h-2 bg-accent rounded-full" />
+                          <span className="text-sm font-semibold text-accent">
+                            All features unlocked! Visit Dashboard →
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
                 );
               }}
             </ConnectButton.Custom>
