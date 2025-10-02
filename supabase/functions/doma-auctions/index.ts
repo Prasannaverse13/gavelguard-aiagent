@@ -5,7 +5,6 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-const DOMA_API_URL = 'https://api-testnet.doma.xyz';
 const DOMA_GRAPHQL_URL = 'https://api-testnet.doma.xyz/graphql';
 
 serve(async (req) => {
@@ -14,133 +13,174 @@ serve(async (req) => {
   }
 
   try {
-    // Read body once and store it
     const requestBody = await req.json();
     const { action } = requestBody;
 
     console.log('Doma API request:', action);
 
-    // Fetch active auctions from Doma Protocol
+    // Fetch active listings (domains for sale) from Doma Protocol
     if (action === 'getAuctions') {
-      // For now, return mock data since we need to determine the correct GraphQL schema
-      // TODO: Update with actual Doma GraphQL schema once confirmed
-      const mockAuctions = [
-        {
-          id: "1",
-          domain: "crypto.vic",
-          currentBid: "5200000000", // 5200 USDC in wei
-          endTime: String(Math.floor(Date.now() / 1000) + 9240), // 2h 34m from now
-          seller: "0x1234...",
-          active: true
-        },
-        {
-          id: "2",
-          domain: "defi.vic",
-          currentBid: "3100000000", // 3100 USDC
-          endTime: String(Math.floor(Date.now() / 1000) + 18720), // 5h 12m from now
-          seller: "0x5678...",
-          active: true
-        },
-        {
-          id: "3",
-          domain: "web3.vic",
-          currentBid: "4500000000", // 4500 USDC
-          endTime: String(Math.floor(Date.now() / 1000) + 4080), // 1h 8m from now
-          seller: "0x9abc...",
-          active: true
-        }
-      ];
+      const graphqlQuery = {
+        query: `
+          query GetListings {
+            listings(take: 10) {
+              items {
+                id
+                name
+                networkId
+                priceUsd
+                createdAt
+                status
+                tokenId
+              }
+            }
+          }
+        `
+      };
 
-      console.log('Returning mock auction data (Doma API integration pending)');
-
-      return new Response(
-        JSON.stringify({ data: { auctions: mockAuctions } }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-    }
-
-    // Fetch domain valuation data
-    if (action === 'getDomainValue') {
-      const { domain } = requestBody;
-      
-      // Fetch from Doma API
-      const response = await fetch(`${DOMA_API_URL}/domains/${domain}`, {
-        method: 'GET',
+      const response = await fetch(DOMA_GRAPHQL_URL, {
+        method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
+        body: JSON.stringify(graphqlQuery),
       });
 
       const data = await response.json();
-      console.log('Domain value data:', data);
+      console.log('Doma listings data:', JSON.stringify(data));
+
+      if (data.errors) {
+        throw new Error(`GraphQL Error: ${JSON.stringify(data.errors)}`);
+      }
+
+      // Transform to auction format
+      const auctions = data.data?.listings?.items?.map((listing: any) => ({
+        id: listing.id,
+        domain: listing.name,
+        currentBid: String(Math.floor((listing.priceUsd || 0) * 1000000)), // Convert USD to USDC wei
+        endTime: String(Math.floor(new Date(listing.createdAt).getTime() / 1000) + (7 * 24 * 60 * 60)), // 7 days from creation
+        seller: "0x0000...",
+        active: listing.status === 'ACTIVE'
+      })) || [];
 
       return new Response(
-        JSON.stringify(data),
+        JSON.stringify({ data: { auctions } }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    // Fetch historical auction data for backtesting
-    if (action === 'getHistoricalAuctions') {
-      const { days } = requestBody;
-      const startTime = Math.floor(Date.now() / 1000) - (days * 24 * 60 * 60);
-
-      // Return mock historical data for backtesting
-      const mockHistoricalAuctions = Array.from({ length: 50 }, (_, i) => ({
-        id: String(i + 1),
-        domain: `domain${i + 1}.vic`,
-        currentBid: String(Math.floor(Math.random() * 10000 + 1000) * 1000000),
-        finalBid: String(Math.floor(Math.random() * 15000 + 1000) * 1000000),
-        endTime: String(startTime + (i * 24 * 60 * 60)),
-        seller: `0x${Math.random().toString(16).substring(2, 10)}...`,
-        winner: Math.random() > 0.3 ? `0x${Math.random().toString(16).substring(2, 10)}...` : null,
-        active: false
-      }));
-
-      console.log('Returning mock historical data for backtesting');
-
-      return new Response(
-        JSON.stringify({ data: { auctions: mockHistoricalAuctions } }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-    }
-
-    // Fetch user's portfolio
+    // Fetch user's domains from Doma Protocol
     if (action === 'getUserDomains') {
       const { address } = requestBody;
 
-      // Return mock user domains
-      const mockDomains = [
-        {
-          id: "1",
-          name: "ai.vic",
-          owner: address.toLowerCase(),
-          purchasePrice: "4200000000", // 4200 USDC
-          tokenId: "1001",
-          createdAt: String(Math.floor(Date.now() / 1000) - (90 * 24 * 60 * 60)) // 90 days ago
-        },
-        {
-          id: "2",
-          name: "meta.vic",
-          owner: address.toLowerCase(),
-          purchasePrice: "3800000000", // 3800 USDC
-          tokenId: "1002",
-          createdAt: String(Math.floor(Date.now() / 1000) - (60 * 24 * 60 * 60)) // 60 days ago
-        },
-        {
-          id: "3",
-          name: "blockchain.vic",
-          owner: address.toLowerCase(),
-          purchasePrice: "6100000000", // 6100 USDC
-          tokenId: "1003",
-          createdAt: String(Math.floor(Date.now() / 1000) - (120 * 24 * 60 * 60)) // 120 days ago
+      const graphqlQuery = {
+        query: `
+          query GetUserDomains($addresses: [AddressCAIP10!]) {
+            names(take: 50, ownedBy: $addresses) {
+              items {
+                id
+                name
+                tokenId
+                createdAt
+                fractionalized
+                listed
+                statistics {
+                  floorPriceUsd
+                  lastSalePriceUsd
+                }
+              }
+            }
+          }
+        `,
+        variables: {
+          addresses: [`eip155:97476:${address}`] // CAIP-10 format for Doma Testnet
         }
-      ];
+      };
 
-      console.log('Returning mock user domains');
+      const response = await fetch(DOMA_GRAPHQL_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(graphqlQuery),
+      });
+
+      const data = await response.json();
+      console.log('User domains data:', JSON.stringify(data));
+
+      if (data.errors) {
+        throw new Error(`GraphQL Error: ${JSON.stringify(data.errors)}`);
+      }
+
+      // Transform to domain format
+      const domains = data.data?.names?.items?.map((name: any) => ({
+        id: name.id,
+        name: name.name,
+        owner: address.toLowerCase(),
+        purchasePrice: String(Math.floor((name.statistics?.lastSalePriceUsd || 0) * 1000000)),
+        tokenId: name.tokenId,
+        createdAt: String(Math.floor(new Date(name.createdAt).getTime() / 1000))
+      })) || [];
 
       return new Response(
-        JSON.stringify({ data: { domains: mockDomains } }),
+        JSON.stringify({ data: { domains } }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Fetch historical data for backtesting
+    if (action === 'getHistoricalAuctions') {
+      const { days } = requestBody;
+      const startDate = new Date();
+      startDate.setDate(startDate.getDate() - days);
+
+      const graphqlQuery = {
+        query: `
+          query GetHistoricalListings($since: DateTime) {
+            listings(take: 100, createdSince: $since) {
+              items {
+                id
+                name
+                priceUsd
+                createdAt
+                status
+              }
+            }
+          }
+        `,
+        variables: {
+          since: startDate.toISOString()
+        }
+      };
+
+      const response = await fetch(DOMA_GRAPHQL_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(graphqlQuery),
+      });
+
+      const data = await response.json();
+      console.log('Historical data:', JSON.stringify(data));
+
+      if (data.errors) {
+        throw new Error(`GraphQL Error: ${JSON.stringify(data.errors)}`);
+      }
+
+      const auctions = data.data?.listings?.items?.map((listing: any) => ({
+        id: listing.id,
+        domain: listing.name,
+        currentBid: String(Math.floor((listing.priceUsd || 0) * 1000000)),
+        finalBid: String(Math.floor((listing.priceUsd || 0) * 1100000)), // Simulate 10% increase
+        endTime: String(Math.floor(new Date(listing.createdAt).getTime() / 1000)),
+        seller: "0x0000...",
+        winner: listing.status === 'SOLD' ? "0x1111..." : null,
+        active: listing.status === 'ACTIVE'
+      })) || [];
+
+      return new Response(
+        JSON.stringify({ data: { auctions } }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
