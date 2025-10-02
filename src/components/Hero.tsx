@@ -22,7 +22,7 @@ const Hero = () => {
               Secure Premium Domains
             </span>
             <br />
-            <span className="gradient-accent bg-clip-text text-transparent">
+            <span className="text-primary">
               At Optimal Prices
             </span>
           </h1>
